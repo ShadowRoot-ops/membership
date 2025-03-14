@@ -1,0 +1,104 @@
+<?php
+include('includes/config.php');
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+$response = array('success' => false, 'message' => '');
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $membershipType = $_POST['membershipType'];
+    $membershipAmount = $_POST['membershipAmount'];
+    $paymentMode = $_POST['paymentMode'];
+
+    $insertQuery = "INSERT INTO membership_types (type, amount, payment_mode) 
+                    VALUES ('$membershipType', $membershipAmount, '$paymentMode')";
+    
+    if ($conn->query($insertQuery) === TRUE) {
+        $response['success'] = true;
+        $response['message'] = 'Membership type added successfully!';
+    } else {
+        $response['message'] = 'Error: ' . $conn->error;
+    }
+}
+?>
+
+<?php include('includes/header.php'); ?>
+
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+<div class="wrapper">
+  <?php include('includes/nav.php'); ?>
+  <?php include('includes/sidebar.php'); ?>
+
+  <div class="content-wrapper">
+    <?php include('includes/pagetitle.php'); ?>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+        <div class="col-md-12">
+
+        <?php if ($response['success']): ?>
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-check"></i> Success</h5>
+                <?php echo $response['message']; ?>
+            </div>
+        <?php elseif (!empty($response['message'])): ?>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-ban"></i> Error</h5>
+                <?php echo $response['message']; ?>
+            </div>
+        <?php endif; ?>
+
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-keyboard"></i> Add Membership Type Form</h3>
+              </div>
+
+              <form method="post" action="">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-4">
+                        <label for="membershipType">Membership Type</label>
+                        <input type="text" class="form-control" id="membershipType" name="membershipType" placeholder="Enter membership type" required>
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="membershipAmount">Amount</label>
+                        <input type="number" class="form-control" id="membershipAmount" name="membershipAmount" placeholder="Enter amount" required>
+                    </div>
+                    <div class="col-sm-4">
+                        <label for="paymentMode">Payment Mode</label>
+                        <select class="form-control" id="paymentMode" name="paymentMode" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Card">Card</option>
+                            <option value="Online">Online</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="main-footer">
+    All rights reserved.
+  </footer>
+</div>
+
+<?php include('includes/footer.php'); ?>
+</body>
+</html>
